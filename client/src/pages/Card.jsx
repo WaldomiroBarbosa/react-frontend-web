@@ -4,7 +4,9 @@ import { FaTimes } from "react-icons/fa";
 import "./Card.css";
 
 function Card({ cardData, closeModal }) {
-    const { image_url, name, level, atk, def, desc } = cardData;
+    const { id, name, level, atk, def, desc, card_images } = cardData;
+    let imageUrl;
+
 
     return (
         <div className="card-overlay" onClick={closeModal}>
@@ -13,7 +15,7 @@ function Card({ cardData, closeModal }) {
                     <FaTimes id="close-icon" />
                 </button>
                 <div>
-                    <img src={image_url} id="card-image" alt="error" />
+                    <img src={card_images} id="card-image" alt="error" />
                 </div>
                 <div>
                     <h3 className="card-name">{name}</h3>
