@@ -4,8 +4,35 @@ import { FaTimes } from "react-icons/fa";
 import "./Card.css";
 
 function Card({ cardData, closeModal }) {
-    const { id, name, level, atk, def, desc, card_images } = cardData;
-    let imageUrl;
+    const { name, level, atk, def, desc, card_images } = cardData;
+    const imageUrl = card_images && card_images.length > 0 ? card_images[0].image_url : "";
+
+    const addHandler = () =>
+    {
+        e.preventDefault();
+
+        Axios.post('http://localhost:3001/addcard/${name}', {
+            name: name
+        }).then((response) => {
+
+        }).catch((error) => {
+            setError("There was an error adding the card");
+        })
+
+    }
+
+    const deleteHandler = () =>
+    {
+        e.preventDefault()
+
+        Axios.delete('http://localhost:3001/deletecard/${name}', {
+            name: name
+        }).then( (response) => {
+
+        }).catch( (error) => {
+            setError("There was an error deleting card.")
+        })
+    }
 
 
     return (
@@ -15,7 +42,7 @@ function Card({ cardData, closeModal }) {
                     <FaTimes id="close-icon" />
                 </button>
                 <div>
-                    <img src={card_images} id="card-image" alt="error" />
+                    <img src={imageUrl} id="card-image" alt={name} className="card-image" />
                 </div>
                 <div>
                     <h3 className="card-name">{name}</h3>
@@ -23,8 +50,8 @@ function Card({ cardData, closeModal }) {
                     <h3 className="description">{desc}</h3>
                 </div>
                 <div>
-                    <button>ADD TO DECK</button>
-                    <button>REMOVE FROM DECK</button>
+                    <button onClick={addHandler()}>ADD TO DECK</button>
+                    <button onClick={deleteHandler()}>REMOVE FROM DECK</button>
                 </div>
             </div>
         </div>

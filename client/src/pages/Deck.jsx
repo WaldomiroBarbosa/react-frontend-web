@@ -1,70 +1,81 @@
-import React, { useEffect, useState } from 'eact';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useLocation, Navigate } from 'eact-router-dom';
+import { Link, useLocation, Navigate } from 'react-router-dom';
 
 import Card from './Card';
+import './Deck.css'; // Adicionando o CSS para o contêiner rolável
 
-function Deck() {
-  const [cards, setCards] = useState( {} )
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const location = useLocation()
+import Header from './Header'
 
-  useEffect(() => {
-    async function verifyToken() {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        return <Navigate to="/login" replace />
-      }
+function Deck({ id }) {
+    const [cards, setCards] = useState([]);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const location = useLocation();
 
-      try {
-        const response = await axios.post('http://localhost:3001/verify-token', { token })
-        if (response.data.isValid) {
-          setIsAuthenticated(true)
-        } else {
-          localStorage.removeItem('token')
-          return <Navigate to="/login" replace />
+    const [username, setUsername] = useState('');
+
+    const [isModal, setIsModal] = useState(false);
+    const [cardData, setCardData] = useState({});
+
+    const fetchCardData = () => {
+        fetch(`https://db.ygoprodeck.com/api/v7/cardinfo.php?name=${result.name}`)
+            .then((response) => response.json())
+            .then((json) => {
+                const card = json.data[0];
+                setCardData(card);
+            });
+    };
+
+    const modalHandler = () => {
+        setIsModal(true);
+        fetchCardData();
+    };
+
+
+    useEffect(() => {
+        // Simulate fetching user data
+        const fetchUserData = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                setUsername('Usuário'); 
+            }
+        };
+
+        fetchUserData();
+    }, []);
+
+    useEffect(() => {
+        // Fetch cards data based on deck ID
+        const fetchCards = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3001/deck/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setCards(response.data.cards);
+            } catch (error) {
+                console.error('Error fetching cards:', error);
+            }
+        };
+
+        if (isAuthenticated) {
+            fetchCards();
         }
-      } catch (error) {
-        console.error(error);
-        localStorage.removeItem('token')
-        return <Navigate to="/login" replace />
-      }
-    }
+    }, [id, isAuthenticated]);
 
-    verifyToken()
-  }, [])
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      async function getCards() {
-        try {
-          const response = await axios.get('http://localhost:3001/deck/', {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
-          })
-          setCards(response.data)
-        } catch (error) {
-          console.error(error)
-        }
-      }
-
-      getCards();
-    }
-  }, [isAuthenticated])
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-
-  return (
-    <div>
-      {cards.map((card) => (
-        <Card key={card.id} card={card} />
-      ))}
-      <Link to="/home">View more cards.</Link>
-    </div>
-  )
+    return (
+      <div>
+        <Header username={username} />
+        <div className="deck-container">
+            {cards.map((card) => (
+                <Card key={card.id} cardData={card} />
+            ))}
+            <Link to="/home">View more cards.</Link>
+        </div>
+        </div>
+    );
 }
 
-export default Deck
+export default Deck;

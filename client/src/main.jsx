@@ -9,6 +9,7 @@ import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import ProtectedRoute from './ProtectedRoute';
+import Deck from './pages/Deck.jsx'
 
 const router = createBrowserRouter([
   {
@@ -22,11 +23,8 @@ const router = createBrowserRouter([
   },
   {
     path: '/home',
-    element: (
-      <ProtectedRoute>
+    element: 
         <Home />
-      </ProtectedRoute>
-    )
   }
 ])
 
